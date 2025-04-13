@@ -1,43 +1,69 @@
-const { readTasks, writeTasks } = require("../models/taskModel");
-const { v4: uuidv4 } = require("uuid");
+const Task = require("../models/taskModel");
 
-const getTasks = (req, res) => {
-  const tasks = readTasks();
-  res.json(tasks);
+// Get all tasks
+const getTasks = async (req, res) => {
+  try {
+    const tasks = await Task.find(); // Fetch tasks from MongoDB
+    res.json(tasks);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching tasks", error: err });
+  }
 };
 
-const addTask = (req, res) => {
-  const tasks = readTasks();
-  const newTask = {
-    id: uuidv4(),
-    title: req.body.title,
-    completed: false,
-  };
-  tasks.push(newTask);
-  writeTasks(tasks);
-  res.status(201).json(newTask);
+// Add a new task
+const addTask = async (req, res) => {
+  try {
+    const newTask = new Task({
+      title: req.body.title,
+      completed: false,
+    });
+
+    const savedTask = await newTask.save(); // Save new task to MongoDB
+    res.status(201).json(savedTask);
+  } catch (err) {
+    res.status(500).json({ message: "Error adding task", error: err });
+  }
 };
 
-const completeTask = (req, res) => {
-  const tasks = readTasks();
-  const taskId = req.params.id;
-  const updatedTasks = tasks.map((task) =>
-    task.id === taskId ? { ...task, completed: true } : task
-  );
-  writeTasks(updatedTasks);
-  res.json({ message: "Task marked as completed" });
+// Mark a task as completed
+const completeTask = async (req, res) => {
+  try {
+    const taskId = req.params.id;
+    const task = await Task.findByIdAndUpdate(
+      taskId,
+      { completed: true },
+      { new: true } // Returns the updated task
+    );
+
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    res.json({ message: "Task marked as completed", task });
+  } catch (err) {
+    res.status(500).json({ message: "Error completing task", error: err });
+  }
 };
 
-const deleteTask = (req, res) => {
-  const tasks = readTasks();
-  const updatedTasks = tasks.filter((task) => task.id !== req.params.id);
-  writeTasks(updatedTasks);
-  res.json({ message: "Task deleted" });
+// Delete a task
+const deleteTask = async (req, res) => {
+  try {
+    const taskId = req.params.id;
+    const deletedTask = await Task.findByIdAndDelete(taskId);
+
+    if (!deletedTask) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    res.json({ message: "Task deleted", task: deletedTask });
+  } catch (err) {
+    res.status(500).json({ message: "Error deleting task", error: err });
+  }
 };
 
 module.exports = {
   getTasks,
   addTask,
-  deleteTask,
   completeTask,
+  deleteTask,
 };

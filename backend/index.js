@@ -1,16 +1,17 @@
-require("dotenv").config(); // Load env variables at the top
-
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const taskRoutes = require("./routes/taskRoutes");
 const authRoutes = require("./routes/authRoutes");
 const { authenticate } = require("./auth/authMiddleware");
+const connectDB = require("./DB/db");
 
 const app = express();
-
-// Use port from .env or fallback to 5000
 const PORT = process.env.PORT || 5000;
+
+// Connect to MongoDB
+connectDB();
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -23,5 +24,5 @@ app.get("/", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });

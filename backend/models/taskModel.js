@@ -1,18 +1,11 @@
-const fs = require("fs");
-const path = require("path");
+// models/taskModel.js
+const mongoose = require("mongoose");
 
-const filePath = path.join(__dirname, "../data/tasks.json");
+const taskSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  completed: { type: Boolean, default: false },
+});
 
-const readTasks = () => {
-  const data = fs.readFileSync(filePath);
-  return JSON.parse(data);
-};
+const Task = mongoose.model("Task", taskSchema);
 
-const writeTasks = (tasks) => {
-  fs.writeFileSync(filePath, JSON.stringify(tasks, null, 2));
-};
-
-module.exports = {
-  readTasks,
-  writeTasks,
-};
+module.exports = Task;
