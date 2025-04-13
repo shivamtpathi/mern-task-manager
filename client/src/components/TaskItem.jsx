@@ -8,12 +8,12 @@ export default function TaskItem({ task, onDelete, onComplete }) {
         {!task.completed && (
           <button
             className="text-green-600"
-            onClick={() => onComplete(task.id)}
+            onClick={() => onComplete(task._id)}
           >
             ✅
           </button>
         )}
-        <button className="text-red-600" onClick={() => onDelete(task.id)}>
+        <button className="text-red-600" onClick={() => onDelete(task._id)}>
           🗑️
         </button>
       </div>

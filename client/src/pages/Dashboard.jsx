@@ -37,7 +37,7 @@ export default function Dashboard() {
       <div className="mt-4 space-y-2">
         {tasks.map((task) => (
           <TaskItem
-            key={task.id}
+            key={task._id}
             task={task}
             onDelete={handleDelete}
             onComplete={handleComplete}
